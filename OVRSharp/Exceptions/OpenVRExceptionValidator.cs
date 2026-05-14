@@ -2,7 +2,7 @@ using Valve.VR;
 
 namespace OVRSharp.Exceptions;
 
-public static class EVROverlayErrorExtension
+public static class OpenVRExceptionValidator
 {
     public static void ThrowIfError(this EVROverlayError error)
     {
