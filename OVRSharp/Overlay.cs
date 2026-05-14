@@ -469,9 +469,9 @@ namespace OVRSharp
         string Name { get; }
 
         OverlayOpacity OverlayOpacity { get; }
-        WidthInMeters WidthInMeters { get; }
+        OverlayWidthInMeters OverlayWidthInMeters { get; }
 
-        Curvature Curvature { get; }
+        OverlayCurvature OverlayCurvature { get; }
 
         IOverlayTransform Transform { get; }
     }
@@ -481,6 +481,12 @@ namespace OVRSharp
         OverlayVisibility Visibility { get; }
 
         IOverlayTransform OverlayTransform { get; }
+    }
+
+    public class OverlayProperty(string key, string name)
+    {
+        public string Key { get; } = key;
+        public string Name { get; } = name;
     }
 
     public class OverlayOpacity(ulong handle)
@@ -497,24 +503,21 @@ namespace OVRSharp
         }
     }
 
-    public class WidthInMeters(ulong overlayHandle)
+    public class OverlayWidthInMeters(ulong overlayHandle)
     {
         public float Value
         {
             get
             {
-                OpenVR.Overlay.GetOverlayWidthInMeters(overlayHandle, ref field);
-                return field;
+                var value = 0.0f;
+                OpenVR.Overlay.GetOverlayWidthInMeters(overlayHandle, ref value).ThrowIfError();
+                return value;
             }
-            set
-            {
-                field = value;
-                OpenVR.Overlay.SetOverlayWidthInMeters(overlayHandle, field);
-            }
+            set => OpenVR.Overlay.SetOverlayWidthInMeters(overlayHandle, value).ThrowIfError();
         }
     }
 
-    public class Curvature(ulong overlayHandle)
+    public class OverlayCurvature(ulong overlayHandle)
     {
         public float Value
         {
@@ -602,10 +605,15 @@ namespace OVRSharp
         public Vector3 Position { get; set; }
         public Quaternion Rotation { get; set; }
 
-        protected uint ResolveDeviceIndex()
+        protected uint ResolveDeviceIndex() => Target switch
         {
-            return Target switch { _ => 0 };
-        }
+            TrackedDevice.HMD => OpenVR.k_unTrackedDeviceIndex_Hmd,
+            TrackedDevice.LeftController => OpenVR.System.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole
+                .LeftHand),
+            TrackedDevice.RightController => OpenVR.System.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole
+                .RightHand),
+            _ => OpenVR.k_unTrackedDeviceIndexInvalid
+        };
 
         public void Apply()
         {
@@ -632,7 +640,7 @@ namespace OVRSharp
         public void Hide() => OpenVR.Overlay.HideOverlay(overlayHandle).ThrowIfError();
     }
 
-    public class Flags(ulong overlayHandle)
+    public class OverlayFlags(ulong overlayHandle)
     {
         public void SetFlag(VROverlayFlags flag, bool value)
         {
