@@ -1,7 +1,11 @@
 ﻿using OVRSharp.Exceptions;
 using System;
-using System.Threading;
+using System.Collections;
+using System.Collections.Generic;
+using System.Numerics;
+using OVRSharp.Math;
 using Valve.VR;
+using System.Threading;
 
 namespace OVRSharp
 {
@@ -19,6 +23,7 @@ namespace OVRSharp
         /// This event is fired when mouse movement is detected.
         /// </summary>
         public event EventHandler<VREvent_t> OnMouseMove;
+
         public event EventHandler<VREvent_t> OnMouseDown;
         public event EventHandler<VREvent_t> OnMouseUp;
         public event EventHandler<VREvent_t> OnUnknown;
@@ -56,7 +61,8 @@ namespace OVRSharp
 
                 if (value == TrackedDeviceRole.None)
                 {
-                    err = OpenVR.Overlay.SetOverlayTransformAbsolute(_overlayHandle, ETrackingUniverseOrigin.TrackingUniverseStanding, ref _transform);
+                    err = OpenVR.Overlay.SetOverlayTransformAbsolute(_overlayHandle,
+                        ETrackingUniverseOrigin.TrackingUniverseStanding, ref _transform);
                     if (err != EVROverlayError.None) throw new Exception($"Could not set transform absolute: {err}");
                     return;
                 }
@@ -113,10 +119,7 @@ namespace OVRSharp
         /// </summary>
         public VROverlayInputMethod InputMethod
         {
-            set
-            {
-                AssertNoError(OpenVR.Overlay.SetOverlayInputMethod(_overlayHandle, value));
-            }
+            set { AssertNoError(OpenVR.Overlay.SetOverlayInputMethod(_overlayHandle, value)); }
 
             get
             {
@@ -185,7 +188,9 @@ namespace OVRSharp
         }
 
         private HmdMatrix34_t _transform;
-        public HmdMatrix34_t Transform {
+
+        public HmdMatrix34_t Transform
+        {
             set
             {
                 if (IsDashboardOverlay) return;
@@ -193,14 +198,17 @@ namespace OVRSharp
                 _transform = value;
 
                 // absolute transform (no tracked devices)
-                if(TrackedDevice == TrackedDeviceRole.None)
+                if (TrackedDevice == TrackedDeviceRole.None)
                 {
-                    AssertNoError(OpenVR.Overlay.SetOverlayTransformAbsolute(_overlayHandle, ETrackingUniverseOrigin.TrackingUniverseStanding, ref value));
+                    AssertNoError(OpenVR.Overlay.SetOverlayTransformAbsolute(_overlayHandle,
+                        ETrackingUniverseOrigin.TrackingUniverseStanding, ref value));
                     return;
                 }
 
                 // relative transform (oops, we are assuming things)
-                AssertNoError(OpenVR.Overlay.SetOverlayTransformTrackedDeviceRelative(_overlayHandle, _trackedDeviceIndex, ref value));
+                AssertNoError(
+                    OpenVR.Overlay.SetOverlayTransformTrackedDeviceRelative(_overlayHandle, _trackedDeviceIndex,
+                        ref value));
             }
 
             get => _transform;
@@ -235,7 +243,8 @@ namespace OVRSharp
         public Overlay(string key, string name, bool dashboardOverlay = false)
         {
             if (OpenVR.Overlay == null)
-                throw new NullReferenceException("OpenVR has not been initialized. Please initialize it by instantiating a new Application.");
+                throw new NullReferenceException(
+                    "OpenVR has not been initialized. Please initialize it by instantiating a new Application.");
 
             EVROverlayError err;
 
@@ -428,7 +437,9 @@ namespace OVRSharp
                 {
                     Thread.Sleep(PollingRate);
                     continue;
-                };
+                }
+
+                ;
 
                 switch ((EVREventType)evt.eventType)
                 {
@@ -446,6 +457,199 @@ namespace OVRSharp
                         break;
                 }
             }
+        }
+    }
+}
+
+namespace OVRSharp
+{
+    public interface IOverlay : IDisposable
+    {
+        string Key { get; }
+        string Name { get; }
+
+        OverlayOpacity OverlayOpacity { get; }
+        WidthInMeters WidthInMeters { get; }
+
+        Curvature Curvature { get; }
+
+        IOverlayTransform Transform { get; }
+    }
+
+    public interface IMovableOverlay : IOverlay
+    {
+        OverlayVisibility Visibility { get; }
+
+        IOverlayTransform OverlayTransform { get; }
+    }
+
+    public class OverlayOpacity(ulong handle)
+    {
+        public float Value
+        {
+            get
+            {
+                var value = 0.0f;
+                OpenVR.Overlay.GetOverlayAlpha(handle, ref value).ThrowIfError();
+                return value;
+            }
+            set => OpenVR.Overlay.SetOverlayAlpha(handle, value);
+        }
+    }
+
+    public class WidthInMeters(ulong overlayHandle)
+    {
+        public float Value
+        {
+            get
+            {
+                OpenVR.Overlay.GetOverlayWidthInMeters(overlayHandle, ref field);
+                return field;
+            }
+            set
+            {
+                field = value;
+                OpenVR.Overlay.SetOverlayWidthInMeters(overlayHandle, field);
+            }
+        }
+    }
+
+    public class Curvature(ulong overlayHandle)
+    {
+        public float Value
+        {
+            get
+            {
+                var value = 0.0f;
+                OpenVR.Overlay.GetOverlayCurvature(overlayHandle, ref value).ThrowIfError();
+                return value;
+            }
+            set => OpenVR.Overlay.SetOverlayCurvature(overlayHandle, value).ThrowIfError();
+        }
+    }
+
+    public interface IOverlayTransform
+    {
+        Vector3 Position { get; set; }
+        Quaternion Rotation { get; set; }
+
+        public void Apply();
+    }
+
+    public sealed class WorldOverlayTransform(ulong overlayHandle) : IOverlayTransform
+    {
+        private Vector3 _position;
+        private Quaternion _rotation = Quaternion.Identity;
+
+        public Vector3 Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                Apply();
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get => _rotation;
+            set
+            {
+                _rotation = value;
+                Apply();
+            }
+        }
+
+        public ETrackingUniverseOrigin Origin
+        {
+            get => _origin;
+            set
+            {
+                _origin = value;
+                Apply();
+            }
+        }
+
+        private ETrackingUniverseOrigin _origin = ETrackingUniverseOrigin.TrackingUniverseStanding;
+
+        public void Apply()
+        {
+            var rotation = Matrix4x4.CreateFromQuaternion(_rotation);
+            var translation = Matrix4x4.CreateTranslation(_position);
+
+            var matrix = rotation * translation;
+
+            var hmd = matrix.ToHmdMatrix34_t();
+
+            OpenVR.Overlay.SetOverlayTransformAbsolute(
+                overlayHandle,
+                _origin,
+                ref hmd);
+        }
+    }
+
+    public class TrackedOverlayTransform(ulong overlayHandle) : IOverlayTransform
+    {
+        public enum TrackedDevice
+        {
+            LeftController,
+            RightController,
+            HMD
+        }
+
+        public TrackedDevice Target { get; set; }
+        public Vector3 Position { get; set; }
+        public Quaternion Rotation { get; set; }
+
+        protected uint ResolveDeviceIndex()
+        {
+            return Target switch { _ => 0 };
+        }
+
+        public void Apply()
+        {
+            var rotation = Matrix4x4.CreateFromQuaternion(Rotation);
+            var translation = Matrix4x4.CreateTranslation(Position);
+            var matrix = (translation * rotation).ToHmdMatrix34_t();
+            OpenVR.Overlay.SetOverlayTransformTrackedDeviceRelative(overlayHandle, ResolveDeviceIndex(), ref matrix)
+                .ThrowIfError();
+        }
+    }
+
+    public class OverlayTexture(ulong overlayHandle)
+    {
+        public void FromFile(string path) => OpenVR.Overlay.SetOverlayFromFile(overlayHandle, path).ThrowIfError();
+
+        public void FromTexture_t(Texture_t texture) =>
+            OpenVR.Overlay.SetOverlayTexture(overlayHandle, ref texture).ThrowIfError();
+    }
+
+    public class OverlayVisibility(ulong overlayHandle)
+    {
+        public void Show() => OpenVR.Overlay.ShowOverlay(overlayHandle).ThrowIfError();
+
+        public void Hide() => OpenVR.Overlay.HideOverlay(overlayHandle).ThrowIfError();
+    }
+
+    public class Flags(ulong overlayHandle)
+    {
+        public void SetFlag(VROverlayFlags flag, bool value)
+        {
+            OpenVR.Overlay.SetOverlayFlag(overlayHandle, flag, value).ThrowIfError();
+        }
+
+        public bool GetFlag(VROverlayFlags flag)
+        {
+            bool value = false;
+            OpenVR.Overlay.GetOverlayFlag(overlayHandle, flag, ref value).ThrowIfError();
+            return value;
+        }
+
+        public bool this[VROverlayFlags flags]
+        {
+            get => GetFlag(flags);
+            set => SetFlag(flags, value);
         }
     }
 }

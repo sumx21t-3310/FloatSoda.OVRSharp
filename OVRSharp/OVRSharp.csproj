@@ -15,6 +15,7 @@
     <Product>OVRSharp</Product>
     <VersionPrefix>1.2.0</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
