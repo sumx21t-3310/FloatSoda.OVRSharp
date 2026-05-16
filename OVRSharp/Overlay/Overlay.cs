@@ -33,42 +33,47 @@ public interface IMovableOverlay : IOverlay
     OverlayTransform Transform { get; }
 }
 
-public class DashboardOverlay : IDashboardOverlay
+public interface IMovableOverlay<out TTransform> : IMovableOverlay where TTransform : OverlayTransform
 {
-    public void Dispose()
-    {
-        throw new NotImplementedException();
-    }
+    new TTransform Transform { get; }
+}
 
+public class DashboardOverlay(DashboardOverlayIdentity identity) : IDashboardOverlay
+{
+    public void Dispose() => Identity.Dispose();
     IOverlayIdentity IOverlay.Identity => Identity;
-
-    public DashboardOverlayIdentity Identity { get; }
-    public OverlayOpacity Opacity { get; }
-    public OverlayWidthInMeters WidthInMeters { get; }
-    public OverlayCurvature Curvature { get; }
-    public OverlayTexture Texture { get; }
-    public OverlayFlags Flags { get; }
-    public OverlayTexture Thumbnail { get; }
+    public DashboardOverlayIdentity Identity { get; } = identity;
+    public OverlayOpacity Opacity { get; } = new(identity.Handle);
+    public OverlayWidthInMeters WidthInMeters { get; } = new(identity.Handle);
+    public OverlayCurvature Curvature { get; } = new(identity.Handle);
+    public OverlayTexture Texture { get; } = new(identity.Handle);
+    public OverlayFlags Flags { get; } = new(identity.Handle);
+    public OverlayTexture Thumbnail { get; } = new(identity.ThumbnailHandle);
 }
 
-public class MovableOverlay<TTransform>(TTransform transform) : IMovableOverlay where TTransform : OverlayTransform
+public abstract class MovableOverlay<TTransform>(OverlayIdentity identity) : IMovableOverlay< TTransform> where TTransform : OverlayTransform
 {
-    public void Dispose()
-    {
-        Identity.Dispose();
-    }
+    public void Dispose() => Identity.Dispose();
 
-    public IOverlayIdentity Identity { get; }
-    public OverlayOpacity Opacity { get; }
-    public OverlayWidthInMeters WidthInMeters { get; }
-    public OverlayCurvature Curvature { get; }
-    public OverlayTexture Texture { get; }
-    public OverlayFlags Flags { get; }
-    public OverlayVisibility Visibility { get; }
-    public OverlayTransform Transform => transform;
+    public IOverlayIdentity Identity { get; } = identity;
+
+    public OverlayOpacity Opacity { get; } = new(identity.Handle);
+    public OverlayWidthInMeters WidthInMeters { get; } = new(identity.Handle);
+    public OverlayCurvature Curvature { get; } = new(identity.Handle);
+    public OverlayTexture Texture { get; } = new(identity.Handle);
+    public OverlayFlags Flags { get; } = new(identity.Handle);
+    public OverlayVisibility Visibility { get; } = new(identity.Handle);
+    
+    OverlayTransform IMovableOverlay.Transform => Transform;
+    public abstract TTransform Transform { get; }
 }
 
-public class DeviceTrackedOverlay(DeviceTrackedOverlayTransform transform)
-    : MovableOverlay<DeviceTrackedOverlayTransform>(transform);
+public class DeviceTrackedOverlay(OverlayIdentity identity) : MovableOverlay<DeviceTrackedOverlayTransform>(identity)
+{
+    public override DeviceTrackedOverlayTransform Transform { get; } = new(identity.Handle);
+}
 
-public class WorldSpaceOverlay(WorldOverlayTransform transform) : MovableOverlay<WorldOverlayTransform>(transform);
+public class WorldSpaceOverlay(OverlayIdentity identity) : MovableOverlay<WorldOverlayTransform>(identity)
+{
+    public override WorldOverlayTransform Transform { get; } = new(identity.Handle);
+}

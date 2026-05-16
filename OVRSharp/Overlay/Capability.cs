@@ -5,8 +5,6 @@ using Valve.VR;
 
 namespace OVRSharp.Overlay;
 
-
-
 public sealed class OverlayOpacity(ulong overlayHandle)
 {
     public float Value

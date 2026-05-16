@@ -2,7 +2,7 @@
 
 namespace OVRSharp.Exceptions
 {
-    public class OpenVRSystemException<TError> : Exception
+    public class OpenVRSystemException<TError> : Exception where TError : Enum
     {
         public readonly TError Error;
 

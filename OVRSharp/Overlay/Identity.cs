@@ -37,8 +37,7 @@ public class DashboardOverlayIdentity(OverlayIdentity identity, ulong thumbnailH
     public void Dispose()
     {
         identity?.Dispose();
-        if (ThumbnailHandle != OpenVR.k_ulOverlayHandleInvalid)
-            OpenVR.Overlay.DestroyOverlay(ThumbnailHandle).ThrowIfError();
+        if (ThumbnailHandle != OpenVR.k_ulOverlayHandleInvalid) OpenVR.Overlay.DestroyOverlay(ThumbnailHandle).ThrowIfError();
     }
 }
 
