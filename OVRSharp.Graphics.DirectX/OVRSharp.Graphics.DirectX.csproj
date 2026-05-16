@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
     <Authors>TJ Horner</Authors>
     <Description>DirectX implementation of OVRSharp graphics APIs</Description>
-    <RepositoryUrl>https://github.com/OVRTools/OVRSharp</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/OVRTools/OVRSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sumx21t-3310/FloatSoda.OVRSharp</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/sumx21t-3310/FloatSoda.OVRSharp</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <PackageTags>openvr</PackageTags>
@@ -26,13 +27,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpDX" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+    <PackageReference Include="SharpDX" Version="4.2.0"/>
+    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0"/>
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OVRSharp\OVRSharp.csproj" />
+    <ProjectReference Include="..\OVRSharp\OVRSharp.csproj"/>
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Nullable>true</Nullable>
     <Authors>TJ Horner</Authors>
     <Description>High-level idiomatic C# interface for working with the OpenVR API</Description>
-    <RepositoryUrl>https://github.com/OVRTools/OVRSharp</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/OVRTools/OVRSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sumx21t-3310/FloatSoda.OVRSharp</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/sumx21t-3310/FloatSoda.OVRSharp</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <PackageTags>openvr</PackageTags>
@@ -15,7 +18,6 @@
     <Product>OVRSharp</Product>
     <VersionPrefix>1.2.0</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -32,9 +34,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  
+
   <ItemGroup>
-    <Folder Include="Math\" />
+    <Folder Include="Math\"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -50,7 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0"/>
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0"/>
   </ItemGroup>
 </Project>
