@@ -1,5 +1,4 @@
-﻿using System;
-using OVRSharp.Exceptions;
+﻿using OVRSharp.Exceptions;
 using Valve.VR;
 
 namespace OVRSharp
@@ -35,7 +34,7 @@ namespace OVRSharp
         }
 
         public readonly ApplicationType Type;
-        public CVRSystem OVRSystem { get; private set; }
+        public CVRSystem? OVRSystem { get; private set; }
 
         /// <summary>
         /// Instantiate and initialize a new <see cref="Application"/>.
@@ -48,13 +47,12 @@ namespace OVRSharp
         public Application(ApplicationType type, string startupInfo = "")
         {
             Type = type;
-            
+
             // Attempt to initialize a new OpenVR context
             var err = EVRInitError.None;
             OVRSystem = OpenVR.Init(ref err, (EVRApplicationType)type, startupInfo);
 
-            if (err != EVRInitError.None)
-                throw new OpenVRSystemException<EVRInitError>("An error occurred while initializing the OpenVR runtime.", err);
+            err.ThrowIfError();
         }
 
         public void Shutdown()
