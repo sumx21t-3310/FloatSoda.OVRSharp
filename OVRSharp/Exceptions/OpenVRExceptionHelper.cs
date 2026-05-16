@@ -14,4 +14,5 @@ public static class OpenVRExceptionHelper
     public static void ThrowIfError(this EVRNotificationError error) => VRNotificationException.ThrowIfError(error);
     public static void ThrowIfError(this ETrackedPropertyError error) => TrackedPropertyException.ThrowIfError(error);
     public static void ThrowIfError(this EVRScreenshotError error) => VRScreenshotException.ThrowIfError(error);
+    public static void ThrowIfError(this EVRRenderModelError error) => VRRenderModelException.ThrowIfError(error);
 }
