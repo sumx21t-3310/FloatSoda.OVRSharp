@@ -98,10 +98,7 @@ public sealed class WorldOverlayTransform(ulong overlayHandle) : OverlayTransfor
     {
         var hmd = GetMatrix().ToHmdMatrix34_t();
 
-        OpenVR.Overlay.SetOverlayTransformAbsolute(
-            overlayHandle,
-            _origin,
-            ref hmd).ThrowIfError();
+        OpenVR.Overlay.SetOverlayTransformAbsolute(overlayHandle, _origin, ref hmd).ThrowIfError();
     }
 }
 
@@ -138,8 +135,7 @@ public sealed class OverlayTexture(ulong overlayHandle)
 {
     public void FromFile(string path) => OpenVR.Overlay.SetOverlayFromFile(overlayHandle, path).ThrowIfError();
 
-    public void FromTexture_t(Texture_t texture) =>
-        OpenVR.Overlay.SetOverlayTexture(overlayHandle, ref texture).ThrowIfError();
+    public void FromTexture_t(Texture_t texture) => OpenVR.Overlay.SetOverlayTexture(overlayHandle, ref texture).ThrowIfError();
 }
 
 public sealed class OverlayVisibility(ulong overlayHandle)

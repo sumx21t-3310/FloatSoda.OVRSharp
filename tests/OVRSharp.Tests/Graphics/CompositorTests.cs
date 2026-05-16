@@ -30,7 +30,7 @@ namespace OVRSharp.Tests.Graphics
             }
             catch(OpenVRSystemException<EVRInitError> e)
             {
-                switch(e.Error)
+                switch(e.ErrorCode)
                 {
                     case EVRInitError.Init_InstallationNotFound:
                     case EVRInitError.Init_VRClientDLLNotFound:
