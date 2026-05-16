@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    
+    
     <Authors>TJ Horner</Authors>
     <Description>DirectX implementation of OVRSharp graphics APIs</Description>
     <RepositoryUrl>https://github.com/sumx21t-3310/FloatSoda.OVRSharp</RepositoryUrl>

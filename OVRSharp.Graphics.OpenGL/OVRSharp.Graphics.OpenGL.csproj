@@ -17,6 +17,7 @@
     <VersionPrefix>1.2.0</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
