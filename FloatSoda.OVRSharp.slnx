@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="OVRSharp.Graphics.DirectX/OVRSharp.Graphics.DirectX.csproj" />
+    <Project Path="OVRSharp.Graphics.OpenGL/OVRSharp.Graphics.OpenGL.csproj" />
+    <Project Path="OVRSharp/OVRSharp.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OVRSharp.Benchmarks/OVRSharp.Benchmarks.csproj" />
+    <Project Path="tests/OVRSharp.Graphics.DirectX.Tests/OVRSharp.Graphics.DirectX.Tests.csproj" />
+    <Project Path="tests/OVRSharp.Graphics.OpenGL.Tests/OVRSharp.Graphics.OpenGL.Tests.csproj" />
+    <Project Path="tests/OVRSharp.Tests/OVRSharp.Tests.csproj" />
+  </Folder>
+</Solution>
